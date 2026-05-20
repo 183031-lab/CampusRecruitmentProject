@@ -1,0 +1,404 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0B1523;
+    --navy2: #111E30;
+    --navy3: #172540;
+    --teal: #00C2A0;
+    --teal2: #00A688;
+    --amber: #F5A623;
+    --red: #E84040;
+    --green: #2ECC71;
+    --text: #E8EFF7;
+    --muted: #7A90AA;
+    --border: rgba(255,255,255,0.07);
+  }
+  .app { font-family: 'Syne', sans-serif; background: var(--navy); color: var(--text); min-height: 600px; padding: 0; }
+  .topbar { background: var(--navy2); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+  .topbar h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.04em; color: var(--text); }
+  .topbar-right { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .season-badge { background: rgba(0,194,160,0.12); border: 1px solid rgba(0,194,160,0.3); color: var(--teal); font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 4px; }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--navy2); padding: 0 24px; }
+  .tab { font-size: 12px; font-weight: 500; padding: 10px 16px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.15s; letter-spacing: 0.03em; }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab:hover:not(.active) { color: var(--text); }
+  .content { padding: 20px 24px; }
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .metric-card { background: var(--navy2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; position: relative; overflow: hidden; }
+  .metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .metric-card.teal::before { background: var(--teal); }
+  .metric-card.amber::before { background: var(--amber); }
+  .metric-card.red::before { background: var(--red); }
+  .metric-card.green::before { background: var(--green); }
+  .metric-label { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .metric-val { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .metric-sub span { color: var(--green); font-weight: 600; }
+  .metric-sub span.down { color: var(--red); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .card { background: var(--navy2); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; font-family: 'DM Mono', monospace; }
+  .funnel-stage { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .funnel-label { font-size: 12px; color: var(--muted); width: 100px; flex-shrink: 0; }
+  .funnel-bar-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 3px; height: 22px; overflow: hidden; position: relative; }
+  .funnel-bar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+  .funnel-count { font-size: 11px; color: var(--muted); width: 44px; text-align: right; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .funnel-drop { font-size: 10px; color: var(--red); width: 36px; text-align: right; flex-shrink: 0; }
+  .campus-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .campus-row:last-child { border-bottom: none; }
+  .campus-name { font-size: 12px; font-weight: 600; width: 90px; flex-shrink: 0; }
+  .campus-bar-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; height: 8px; }
+  .campus-bar { height: 100%; border-radius: 2px; }
+  .campus-score { font-size: 11px; font-family: 'DM Mono', monospace; width: 36px; text-align: right; flex-shrink: 0; }
+  .campus-tag { font-size: 9px; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+  .tag-top { background: rgba(0,194,160,0.15); color: var(--teal); }
+  .tag-mid { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .tag-low { background: rgba(232,64,64,0.15); color: var(--red); }
+  .pie-wrap { display: flex; align-items: center; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 11px; color: var(--muted); }
+  .legend-val { font-size: 11px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; margin-left: auto; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 12px; }
+  .tl-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .tl-content { padding-bottom: 4px; }
+  .tl-date { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); }
+  .tl-event { font-size: 12px; color: var(--text); margin-top: 2px; }
+  .tl-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .alert-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
+  .alert-row.warn { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.2); }
+  .alert-row.danger { background: rgba(232,64,64,0.08); border: 1px solid rgba(232,64,64,0.2); }
+  .alert-row.ok { background: rgba(0,194,160,0.08); border: 1px solid rgba(0,194,160,0.2); }
+  .alert-icon { font-size: 14px; flex-shrink: 0; }
+  .alert-text { font-size: 11px; flex: 1; }
+  .alert-text strong { color: var(--text); font-weight: 600; }
+  .alert-text span { color: var(--muted); }
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mini-stat { background: var(--navy3); border-radius: 6px; padding: 10px 12px; }
+  .mini-stat-val { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .mini-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .full-table { width: 100%; border-collapse: collapse; }
+  .full-table th { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .full-table td { font-size: 12px; padding: 10px 10px; border-bottom: 1px solid var(--border); }
+  .full-table tr:last-child td { border-bottom: none; }
+  .full-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .pill { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+  .pill-green { background: rgba(46,204,113,0.15); color: var(--green); }
+  .pill-amber { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .pill-red { background: rgba(232,64,64,0.15); color: var(--red); }
+  .score-bar { display: flex; align-items: center; gap: 6px; }
+  .score-bar-fill { height: 6px; border-radius: 3px; }
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-dot"></div>
+      <h1>BCN Campus Recruitment Intelligence</h1>
+      <span class="season-badge">Placement Season 2024–25</span>
+    </div>
+    <div class="topbar-right">Last updated: 20 May 2025 · 09:41 IST</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview', this)">Overview</div>
+    <div class="tab" onclick="switchTab('funnel', this)">Pipeline Funnel</div>
+    <div class="tab" onclick="switchTab('campuses', this)">Campus ROI</div>
+    <div class="tab" onclick="switchTab('calendar', this)">Event Calendar</div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="metrics-row">
+        <div class="metric-card teal">
+          <div class="metric-label">Total Applications</div>
+          <div class="metric-val">1,847</div>
+          <div class="metric-sub"><span>↑ 18%</span> vs last season</div>
+        </div>
+        <div class="metric-card amber">
+          <div class="metric-label">Offers Extended</div>
+          <div class="metric-val">94</div>
+          <div class="metric-sub">5.1% conversion rate</div>
+        </div>
+        <div class="metric-card red">
+          <div class="metric-label">Offer Acceptance</div>
+          <div class="metric-val">71%</div>
+          <div class="metric-sub"><span class="down">↓ 6pt</span> vs target 77%</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Campuses Active</div>
+          <div class="metric-val">12</div>
+          <div class="metric-sub"><span>↑ 2</span> new this season</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">⚠ Alerts &amp; Actions Required</div>
+          <div class="alert-row danger">
+            <div class="alert-icon">🔴</div>
+            <div class="alert-text"><strong>IIM Calcutta offer acceptance dropped to 54%</strong><br><span>3 candidates withdrew after competing offers from MBB</span></div>
+          </div>
+          <div class="alert-row warn">
+            <div class="alert-icon">🟡</div>
+            <div class="alert-text"><strong>XLRI event in 4 days — venue not confirmed</strong><br><span>Coordinate with campus SPOC by EOD</span></div>
+          </div>
+          <div class="alert-row warn">
+            <div class="alert-icon">🟡</div>
+            <div class="alert-text"><strong>22 candidates at final round &gt;7 days pending</strong><br><span>Decision delay increasing dropout risk</span></div>
+          </div>
+          <div class="alert-row ok">
+            <div class="alert-icon">🟢</div>
+            <div class="alert-text"><strong>IIM Ahmedabad PPT attendance up 34%</strong><br><span>Employer brand initiative working</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Drop-off Reasons (This Season)</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--muted)">Competing offer accepted</span><span style="font-family:'DM Mono',monospace">34%</span></div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:8px;"><div style="width:34%;height:100%;border-radius:3px;background:var(--red)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--muted)">Long wait between rounds</span><span style="font-family:'DM Mono',monospace">28%</span></div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:8px;"><div style="width:28%;height:100%;border-radius:3px;background:var(--amber)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--muted)">Poor PPT / low engagement</span><span style="font-family:'DM Mono',monospace">19%</span></div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:8px;"><div style="width:19%;height:100%;border-radius:3px;background:#7A90AA)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--muted)">Stipend mismatch</span><span style="font-family:'DM Mono',monospace">11%</span></div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:8px;"><div style="width:11%;height:100%;border-radius:3px;background:#5EEAD4)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--muted)">Other / unknown</span><span style="font-family:'DM Mono',monospace">8%</span></div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:8px;"><div style="width:8%;height:100%;border-radius:3px;background:#374151"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Season-to-date Progress by Campus</div>
+        <table class="full-table">
+          <thead><tr><th>Campus</th><th>Applications</th><th>Screened</th><th>Final Round</th><th>Offers</th><th>Accepted</th><th>Acceptance %</th><th>ROI Score</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600">IIM Ahmedabad</td><td>312</td><td>89</td><td>24</td><td>18</td><td>16</td><td><span class="pill pill-green">89%</span></td><td><span style="color:var(--teal);font-weight:700">91</span></td></tr>
+            <tr><td style="font-weight:600">IIM Bangalore</td><td>287</td><td>76</td><td>21</td><td>15</td><td>13</td><td><span class="pill pill-green">87%</span></td><td><span style="color:var(--teal);font-weight:700">88</span></td></tr>
+            <tr><td style="font-weight:600">ISB Hyderabad</td><td>198</td><td>54</td><td>18</td><td>14</td><td>11</td><td><span class="pill pill-amber">79%</span></td><td><span style="color:var(--amber);font-weight:700">74</span></td></tr>
+            <tr><td style="font-weight:600">IIM Calcutta</td><td>276</td><td>71</td><td>19</td><td>13</td><td>7</td><td><span class="pill pill-red">54%</span></td><td><span style="color:var(--red);font-weight:700">51</span></td></tr>
+            <tr><td style="font-weight:600">XLRI Jamshedpur</td><td>143</td><td>38</td><td>12</td><td>9</td><td>7</td><td><span class="pill pill-amber">78%</span></td><td><span style="color:var(--amber);font-weight:700">72</span></td></tr>
+            <tr><td style="font-weight:600">FMS Delhi</td><td>211</td><td>49</td><td>14</td><td>11</td><td>8</td><td><span class="pill pill-amber">73%</span></td><td><span style="color:var(--amber);font-weight:700">68</span></td></tr>
+            <tr><td style="font-weight:600">IIT Bombay (MBA)</td><td>176</td><td>42</td><td>11</td><td>8</td><td>5</td><td><span class="pill pill-red">63%</span></td><td><span style="color:var(--red);font-weight:700">55</span></td></tr>
+            <tr><td style="font-weight:600">MDI Gurgaon</td><td>112</td><td>28</td><td>8</td><td>6</td><td>5</td><td><span class="pill pill-green">83%</span></td><td><span style="color:var(--teal);font-weight:700">79</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FUNNEL -->
+    <div class="page" id="page-funnel">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Recruitment Pipeline — All Campuses</div>
+          <div style="margin-top:6px;">
+            <div class="funnel-stage">
+              <div class="funnel-label">Applications</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,#00C2A0,#00A688);color:#0B1523">1,847</div></div>
+              <div class="funnel-drop"></div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">Resume Screen</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:57%;background:rgba(0,194,160,0.7);color:var(--text)">1,053</div></div>
+              <div class="funnel-drop" style="color:var(--muted)">−43%</div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">Case Round 1</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:rgba(0,194,160,0.5);color:var(--text)">521</div></div>
+              <div class="funnel-drop">−50%</div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">Case Round 2</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:16%;background:rgba(245,166,35,0.6);color:#0B1523">298</div></div>
+              <div class="funnel-drop">−43%</div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">HR Round</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:9%;background:rgba(245,166,35,0.85);color:#0B1523">167</div></div>
+              <div class="funnel-drop">−44%</div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">Offers Made</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:5.1%;background:var(--amber);color:#0B1523">94</div></div>
+              <div class="funnel-drop">−44%</div>
+            </div>
+            <div class="funnel-stage">
+              <div class="funnel-label">Accepted</div>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3.6%;background:var(--green);color:#0B1523">67</div></div>
+              <div class="funnel-drop">−29%</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:10px 12px;background:rgba(232,64,64,0.07);border:1px solid rgba(232,64,64,0.2);border-radius:6px;font-size:11px;color:var(--muted);">
+            🔍 <strong style="color:var(--text)">Biggest leak:</strong> Resume Screen → Case 1 (50% drop). Suggests screening criteria may be filtering too broadly or case prep communication is poor.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Stage Conversion Benchmarks</div>
+          <table class="full-table" style="margin-top:4px;">
+            <thead><tr><th>Stage</th><th>Bain BCN</th><th>Industry Avg</th><th>Gap</th></tr></thead>
+            <tbody>
+              <tr><td>App → Screened</td><td>57%</td><td>48%</td><td><span style="color:var(--green)">+9pt ✓</span></td></tr>
+              <tr><td>Screened → Case 1</td><td>49%</td><td>55%</td><td><span style="color:var(--red)">−6pt ✗</span></td></tr>
+              <tr><td>Case 1 → Case 2</td><td>57%</td><td>52%</td><td><span style="color:var(--green)">+5pt ✓</span></td></tr>
+              <tr><td>Case 2 → HR</td><td>56%</td><td>58%</td><td><span style="color:var(--muted)">−2pt ~</span></td></tr>
+              <tr><td>HR → Offer</td><td>56%</td><td>54%</td><td><span style="color:var(--green)">+2pt ✓</span></td></tr>
+              <tr><td>Offer → Accept</td><td>71%</td><td>78%</td><td><span style="color:var(--red)">−7pt ✗</span></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:12px;">
+            <div class="card-title">Time in Each Stage (Avg Days)</div>
+            <div style="margin-top:6px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;">
+                <span style="color:var(--muted);width:120px">Application review</span>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:2px;height:8px;"><div style="width:30%;height:100%;border-radius:2px;background:var(--teal)"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--text)">3d</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;">
+                <span style="color:var(--muted);width:120px">Between rounds</span>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:2px;height:8px;"><div style="width:70%;height:100%;border-radius:2px;background:var(--amber)"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--amber)">7d ⚠</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;">
+                <span style="color:var(--muted);width:120px">Offer to acceptance</span>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:2px;height:8px;"><div style="width:50%;height:100%;border-radius:2px;background:var(--red)"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--red)">5d ↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPUS ROI -->
+    <div class="page" id="page-campuses">
+      <div class="three-col" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-title">Top Performer</div>
+          <div style="font-size:18px;font-weight:700;color:var(--teal);margin-bottom:4px;">IIM Ahmedabad</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">ROI Score: <strong style="color:var(--text)">91 / 100</strong></div>
+          <div class="mini-grid">
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--teal)">89%</div><div class="mini-stat-label">Acceptance Rate</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">312</div><div class="mini-stat-label">Applications</div></div>
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--green)">16</div><div class="mini-stat-label">Hires made</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">5.1%</div><div class="mini-stat-label">App→Hire rate</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Needs Attention</div>
+          <div style="font-size:18px;font-weight:700;color:var(--red);margin-bottom:4px;">IIM Calcutta</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">ROI Score: <strong style="color:var(--text)">51 / 100</strong></div>
+          <div class="mini-grid">
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--red)">54%</div><div class="mini-stat-label">Acceptance Rate</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">276</div><div class="mini-stat-label">Applications</div></div>
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--red)">7</div><div class="mini-stat-label">Hires made</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">2.5%</div><div class="mini-stat-label">App→Hire rate</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Rising Campus</div>
+          <div style="font-size:18px;font-weight:700;color:var(--amber);margin-bottom:4px;">MDI Gurgaon</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">ROI Score: <strong style="color:var(--text)">79 / 100</strong> ↑12pt</div>
+          <div class="mini-grid">
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--green)">83%</div><div class="mini-stat-label">Acceptance Rate</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">112</div><div class="mini-stat-label">Applications</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">5</div><div class="mini-stat-label">Hires made</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">4.5%</div><div class="mini-stat-label">App→Hire rate</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Campus ROI Scorecard — All Campuses</div>
+        <div style="margin-top:6px;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:10px;font-family:'DM Mono',monospace;">Score = weighted avg of: offer acceptance (40%) + app→hire rate (30%) + PPT attendance (20%) + retention proxy (10%)</div>
+          <div class="campus-row"><div class="campus-name">IIM Ahmedabad</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:91%;background:var(--teal)"></div></div><div class="campus-score" style="color:var(--teal)">91</div><div class="campus-tag tag-top">TIER 1</div></div>
+          <div class="campus-row"><div class="campus-name">IIM Bangalore</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:88%;background:var(--teal)"></div></div><div class="campus-score" style="color:var(--teal)">88</div><div class="campus-tag tag-top">TIER 1</div></div>
+          <div class="campus-row"><div class="campus-name">MDI Gurgaon</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:79%;background:#4ade80"></div></div><div class="campus-score" style="color:#4ade80">79</div><div class="campus-tag tag-mid">TIER 2</div></div>
+          <div class="campus-row"><div class="campus-name">ISB Hyderabad</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:74%;background:var(--amber)"></div></div><div class="campus-score" style="color:var(--amber)">74</div><div class="campus-tag tag-mid">TIER 2</div></div>
+          <div class="campus-row"><div class="campus-name">XLRI</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:72%;background:var(--amber)"></div></div><div class="campus-score" style="color:var(--amber)">72</div><div class="campus-tag tag-mid">TIER 2</div></div>
+          <div class="campus-row"><div class="campus-name">FMS Delhi</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:68%;background:var(--amber)"></div></div><div class="campus-score" style="color:var(--amber)">68</div><div class="campus-tag tag-mid">TIER 2</div></div>
+          <div class="campus-row"><div class="campus-name">IIM Calcutta</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:51%;background:var(--red)"></div></div><div class="campus-score" style="color:var(--red)">51</div><div class="campus-tag tag-low">REVIEW</div></div>
+          <div class="campus-row"><div class="campus-name">IIT Bombay</div><div class="campus-bar-wrap"><div class="campus-bar" style="width:55%;background:var(--red)"></div></div><div class="campus-score" style="color:var(--red)">55</div><div class="campus-tag tag-low">REVIEW</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Upcoming Events</div>
+          <div class="timeline-item">
+            <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-date">23 May 2025 · URGENT</div><div class="tl-event" style="font-weight:600">XLRI Jamshedpur — Pre-placement Talk</div><div class="tl-detail">Venue unconfirmed · 140 students expected · 3 panel members needed</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--amber)"></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-date">27 May 2025</div><div class="tl-event" style="font-weight:600">ISB Hyderabad — Interview Day</div><div class="tl-detail">18 candidates · 6 interview slots · Travel confirmed</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--teal)"></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-date">3 Jun 2025</div><div class="tl-event" style="font-weight:600">FMS Delhi — Career Fair</div><div class="tl-detail">Booth materials ordered · Goodies confirmed</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--teal)"></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-date">9 Jun 2025</div><div class="tl-event" style="font-weight:600">IIM Lucknow — Pre-placement Talk</div><div class="tl-detail">New campus · First engagement this season</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--muted)"></div></div>
+            <div class="tl-content"><div class="tl-date">14–16 Jun 2025</div><div class="tl-event">MDI Gurgaon — Final Interviews</div><div class="tl-detail">8 candidates shortlisted</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Event Readiness Checklist — XLRI (23 May)</div>
+          <div style="margin-top:4px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--green)">✓</span><span>Presentations deck finalized</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--green)">✓</span><span>Campus SPOC contact confirmed</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--green)">✓</span><span>Panel bios sent to student committee</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--red);font-weight:700">✗</span><span style="color:var(--red)">Venue / room booking — NOT CONFIRMED</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--red);font-weight:700">✗</span><span style="color:var(--red)">Travel bookings for 2 team members</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--amber)">~</span><span style="color:var(--amber)">Branded merchandise — in transit</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:12px;"><span style="color:var(--green)">✓</span><span>Feedback form created &amp; tested</span></div>
+          </div>
+          <div style="margin-top:14px;padding:10px;background:rgba(232,64,64,0.08);border:1px solid rgba(232,64,64,0.2);border-radius:6px;font-size:11px;color:var(--muted);">
+            <strong style="color:var(--red)">2 critical items unresolved</strong> · Event is in 3 days · Escalate today
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('page-' + name).classList.add('active');
+}
+</script>
